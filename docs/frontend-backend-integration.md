@@ -1,6 +1,6 @@
 # Frontend ↔ Backend Integration
 
-Novari uses a Vite React frontend at the repo root and a Django REST API in `Novari/`.
+This branch (`main`) is the Vite React storefront and admin UI. The Django REST API lives on the **`backend-system`** branch (under `Novari/` in that checkout).
 
 ## Environment
 
@@ -14,67 +14,25 @@ VITE_API_URL=http://localhost:8000
 
 `VITE_API_URL` is the Django origin (no trailing slash). API modules call paths like `/api/products/`, so requests resolve to `http://localhost:8000/api/products/`.
 
-API requests go **directly** to Django via `VITE_API_URL` (CORS is enabled for `localhost:5173`). There is **no Vite dev proxy** — do not re-add one. React routes such as `/admin` and `/products` live on the Vite server; proxying those paths to Django would break the SPA.
-
-### Backend (`Novari/.env`)
-
-Copy `Novari/.env.example` to `Novari/.env` and configure — `settings.py` requires `DJANGO_SECRET_KEY` and `DB_PASSWORD` (it raises if either is missing):
-
-```env
-DJANGO_SECRET_KEY=dev-insecure-key-change-for-production
-DJANGO_DEBUG=true
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
-DJANGO_CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
-DB_NAME=novari_db
-DB_USER=novari_user
-DB_PASSWORD=change-me-for-production
-DB_HOST=localhost
-DB_PORT=5433
-```
-
-`Novari/settings.py` defaults to port **5433** to match Docker Compose. Both `docker-compose.yml` and `settings.py` read `DB_PASSWORD` from `.env`, so the value just needs to be consistent between them. Generate a strong `DJANGO_SECRET_KEY` for production with `python -c "import secrets; print(secrets.token_urlsafe(50))"`.
+API requests go **directly** to Django via `VITE_API_URL` (CORS must allow your storefront origin). There is **no Vite dev proxy** — do not re-add one. React routes such as `/admin` and `/products` live on the Vite server; proxying those paths to Django would break the SPA.
 
 ## Local development
 
-Terminal 1 — database (Docker):
+**Terminal 1 — backend** (separate clone or worktree on `backend-system`):
 
 ```bash
+git checkout backend-system
 cd Novari
-copy .env.example .env   # one-time: create your local env file (required)
+copy .env.example .env
 docker compose up -d
-```
-
-PostgreSQL listens on host port **5433** (`5433:5432` in `docker-compose.yml`). `docker-compose.yml` reads `DB_NAME` / `DB_USER` / `DB_PASSWORD` from `Novari/.env` (the same file `settings.py` reads), so the credentials stay in sync.
-
-> **Port note:** If another Postgres container already uses `5432`, Novari binds to **5433** so both can run side by side.
-
-Terminal 2 — backend:
-
-```bash
-cd Novari
-# Option A: Pipenv (Pipfile targets Python 3.12)
-pipenv install
-pipenv run python manage.py migrate
-pipenv run python manage.py seed_products
-pipenv run python manage.py runserver
-
-# Option B: local venv (e.g. Python 3.14)
-python -m venv .venv
-.\.venv\Scripts\pip install django djangorestframework django-cors-headers pillow psycopg2-binary
 .\.venv\Scripts\python manage.py migrate
 .\.venv\Scripts\python manage.py seed_products
 .\.venv\Scripts\python manage.py runserver
 ```
 
-`seed_products` loads the static catalog into PostgreSQL so the storefront has data without manual entry. It also creates an admin user (`admin@novari.test` by default) whose password is read from `SEED_ADMIN_PASSWORD` — if unset, a strong random password is generated and printed to the console.
+See `docs/frontend-backend-integration.md` on **`backend-system`** for full backend env vars and setup options.
 
-To create an admin user manually with a strong password:
-
-```bash
-.\.venv\Scripts\python manage.py shell -c "from novari_base.models import User; u=User(email='admin@novari.test', name='Admin', role=User.ROLE_ADMIN); u.set_password('REPLACE_WITH_STRONG_PASSWORD'); u.save(); print(u.id)"
-```
-
-Terminal 3 — frontend:
+**Terminal 2 — frontend** (this branch):
 
 ```bash
 pnpm install
@@ -138,7 +96,7 @@ Admin inventory fields (`in_stock`, `stock_count`, `sales`) are mapped to `Admin
 pnpm lint && pnpm build
 ```
 
-Manual checks:
+Manual checks (backend must be running from **`backend-system`**):
 
 1. Home and `/products` load catalog data from the API.
 2. `/products/:id` resolves a product or shows not found.

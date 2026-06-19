@@ -30,9 +30,9 @@ There are no tests yet; verify with `pnpm lint && pnpm build`.
 
 ## Backend integration
 
-- Django API lives in `Novari/` (separate from the pnpm workspace).
+- Django API lives on the **`backend-system`** branch (`Novari/` in that checkout). This branch is frontend-only.
 - REST endpoints are under the `/api/` prefix (e.g. `GET /api/products/`). Set `VITE_API_URL=http://localhost:8000` in `.env.local` (see `.env.example`); API module paths include the `/api/` segment. No Vite dev proxy — requests go directly to Django (CORS).
-- Seed catalog after migrate: `python manage.py seed_products` (from `Novari/`).
+- Run the backend locally: `git checkout backend-system`, then follow setup in that branch's docs.
 - Frontend API docs: `docs/frontend-backend-integration.md`.
 
 ## TypeScript conventions

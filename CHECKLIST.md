@@ -2,7 +2,9 @@
 
 Use this list before delivering the project files and before going live. Check items off as you complete them.
 
-**Stack:** React 19 + Vite 8 (repo root) · Django 6 + DRF + PostgreSQL (`Novari/`)
+**Stack:** React 19 + Vite 8 (`main` branch) · Django 6 + DRF + PostgreSQL (`backend-system` branch, `Novari/`)
+
+> Backend source, env files, and backend-specific checklist items live on **`backend-system`**. This checklist covers the frontend repo on **`main`**.
 
 ---
 
