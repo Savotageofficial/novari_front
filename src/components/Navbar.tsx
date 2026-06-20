@@ -81,17 +81,6 @@ export function Navbar({ visible, logoRef }: NavbarProps) {
             Cart [{count}]
           </NavButton>
         </m.div>
-
-        <m.div
-          className="flex items-center justify-end md:hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: visible ? 1 : 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-        >
-          <NavButton onClick={openCart} className="px-0" aria-label={`Open cart, ${count} items`}>
-            Cart [{count}]
-          </NavButton>
-        </m.div>
       </nav>
 
       <MobileMenu
