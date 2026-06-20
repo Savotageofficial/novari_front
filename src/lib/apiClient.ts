@@ -73,6 +73,35 @@ export async function apiRequest<T>(
   return payload as T
 }
 
+export async function apiFormDataRequest<T>(
+  path: string,
+  fields: Record<string, string>,
+  options: { method?: string; token?: string | null } = {}
+): Promise<T> {
+  const { method = 'POST', token } = options
+  const formData = new FormData()
+
+  for (const [key, value] of Object.entries(fields)) {
+    formData.append(key, value)
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    headers: {
+      ...(token ? { Authorization: formatAuthHeader(token) } : {}),
+    },
+    body: formData,
+  })
+
+  const payload: unknown = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    throw new ApiError(getErrorMessage(response.status, payload), response.status, payload)
+  }
+
+  return payload as T
+}
+
 export async function apiUploadFile<T>(
   path: string,
   file: File,

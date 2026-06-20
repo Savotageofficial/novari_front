@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { fetchAdminOrders } from '../api/admin'
-import type { ApiOrder } from '../api/types'
+import { fetchAdminOrders, updateAdminOrderStatus } from '../api/admin'
+import type { AdminOrderStatus, ApiOrder } from '../api/types'
 import { useAdminAuth } from './useAdminAuth'
 
 export type OrderSortKey = 'id' | 'date' | 'customer' | 'total'
@@ -58,6 +58,7 @@ export function useAdminOrders() {
   const [orders, setOrders] = useState<ApiOrder[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [savingIds, setSavingIds] = useState<Set<number>>(new Set())
 
   const loadOrders = useCallback(() => {
     if (!token) return
@@ -105,11 +106,52 @@ export function useAdminOrders() {
 
   const orderCount = useMemo(() => orders.length, [orders])
 
+  const updateOrderStatus = useCallback(
+    (orderId: number, status: AdminOrderStatus) => {
+      if (!token) return
+
+      const previousStatus = orders.find((order) => order.id === orderId)?.status
+
+      setOrders((prev) =>
+        prev.map((order) => (order.id === orderId ? { ...order, status } : order))
+      )
+
+      setSavingIds((prev) => new Set(prev).add(orderId))
+
+      void updateAdminOrderStatus(token, orderId, status)
+        .then((updated) => {
+          setOrders((prev) =>
+            prev.map((order) => (order.id === orderId ? updated : order))
+          )
+        })
+        .catch((err) => {
+          if (previousStatus !== undefined) {
+            setOrders((prev) =>
+              prev.map((order) =>
+                order.id === orderId ? { ...order, status: previousStatus } : order
+              )
+            )
+          }
+          setError(err instanceof Error ? err.message : 'Failed to update order status')
+        })
+        .finally(() => {
+          setSavingIds((prev) => {
+            const next = new Set(prev)
+            next.delete(orderId)
+            return next
+          })
+        })
+    },
+    [orders, token]
+  )
+
   return {
     orders,
     orderCount,
     isLoading,
     error,
+    savingIds,
     reload: loadOrders,
+    updateOrderStatus,
   }
 }
