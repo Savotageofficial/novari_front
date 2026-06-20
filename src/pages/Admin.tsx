@@ -48,7 +48,9 @@ export default function Admin() {
     orderCount,
     isLoading: ordersLoading,
     error: ordersError,
+    savingIds: savingOrderIds,
     reload: reloadOrders,
+    updateOrderStatus,
   } = useAdminOrders()
 
   const [searchQuery, setSearchQuery] = useState('')
@@ -219,6 +221,8 @@ export default function Admin() {
                 onSort={handleOrderSort}
                 expandedId={expandedOrderId}
                 onToggleRow={handleToggleOrderRow}
+                savingIds={savingOrderIds}
+                onStatusChange={updateOrderStatus}
               />
             </>
           )}

@@ -49,6 +49,10 @@ export interface ApiOrderResponse {
   success: string
 }
 
+export const ADMIN_ORDER_STATUSES = ['IN_PROGRESS', 'COMPLETED'] as const
+
+export type AdminOrderStatus = (typeof ADMIN_ORDER_STATUSES)[number]
+
 export interface ApiOrder {
   id: number
   email: string
@@ -59,6 +63,7 @@ export interface ApiOrder {
   city: string
   payment_method: string
   order_notes: string
+  status: string
   created_at: string
   items: ApiOrderItem[]
   total: number

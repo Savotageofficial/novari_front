@@ -1,11 +1,15 @@
 import { AnimatePresence, m } from 'framer-motion'
+import type { AdminOrderStatus } from '../../api/types'
 import type { ApiOrder } from '../../api/types'
 import { formatPrice } from '../../data/products'
+import { AdminOrderStatusSelect } from './AdminOrderStatusSelect'
 
 interface AdminOrderRowProps {
   order: ApiOrder
   expanded: boolean
+  saving?: boolean
   onToggle: () => void
+  onStatusChange: (orderId: number, status: AdminOrderStatus) => void
 }
 
 const chevron = (
@@ -37,7 +41,13 @@ function formatProductId(productId: number): string {
   return String(productId).padStart(2, '0')
 }
 
-export function AdminOrderRow({ order, expanded, onToggle }: AdminOrderRowProps) {
+export function AdminOrderRow({
+  order,
+  expanded,
+  saving = false,
+  onToggle,
+  onStatusChange,
+}: AdminOrderRowProps) {
   return (
     <>
       <tr className="border-b border-cream/10 bg-obsidian transition-colors duration-300 last:border-b-0 hover:bg-charcoal/50">
@@ -77,6 +87,14 @@ export function AdminOrderRow({ order, expanded, onToggle }: AdminOrderRowProps)
         <td className="px-6 py-4 align-middle">
           <p className="font-mono text-sm text-cream/80">{formatPrice(order.total)}</p>
         </td>
+        <td className="px-6 py-4 align-middle">
+          <AdminOrderStatusSelect
+            orderId={order.id}
+            status={order.status}
+            disabled={saving}
+            onChange={onStatusChange}
+          />
+        </td>
       </tr>
 
       <AnimatePresence initial={false}>
@@ -88,7 +106,7 @@ export function AdminOrderRow({ order, expanded, onToggle }: AdminOrderRowProps)
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="border-b border-cream/10 bg-charcoal/30"
           >
-            <td colSpan={5} className="p-0">
+            <td colSpan={6} className="p-0">
               <div className="grid gap-8 px-6 py-8 md:grid-cols-2 md:px-10">
                 <section>
                   <h3 className="mb-4 font-mono text-nav uppercase tracking-widest text-gold">

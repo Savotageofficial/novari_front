@@ -1,10 +1,15 @@
-import { apiRequest, apiUploadFile } from '../lib/apiClient'
+import { apiFormDataRequest, apiRequest, apiUploadFile } from '../lib/apiClient'
 import {
   toAdminProduct,
   toApiProductPayload,
   type AdminProduct,
 } from './products'
-import type { ApiAdminLoginResponse, ApiOrder, ApiProduct } from './types'
+import type {
+  AdminOrderStatus,
+  ApiAdminLoginResponse,
+  ApiOrder,
+  ApiProduct,
+} from './types'
 
 export async function adminLogin(
   email: string,
@@ -84,4 +89,15 @@ export async function uploadProductImage(
 
 export async function fetchAdminOrders(token: string): Promise<ApiOrder[]> {
   return apiRequest<ApiOrder[]>('/api/admin/orders/', { token })
+}
+
+export async function updateAdminOrderStatus(
+  token: string,
+  orderId: number,
+  status: AdminOrderStatus
+): Promise<ApiOrder> {
+  return apiFormDataRequest<ApiOrder>(`/api/admin/order/${orderId}/`, { status }, {
+    method: 'PATCH',
+    token,
+  })
 }
