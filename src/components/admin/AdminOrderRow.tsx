@@ -33,6 +33,10 @@ function customerName(order: ApiOrder): string {
   return `${order.firstname} ${order.lastname}`.trim() || '—'
 }
 
+function formatProductId(productId: number): string {
+  return String(productId).padStart(2, '0')
+}
+
 export function AdminOrderRow({ order, expanded, onToggle }: AdminOrderRowProps) {
   return (
     <>
@@ -140,9 +144,12 @@ export function AdminOrderRow({ order, expanded, onToggle }: AdminOrderRowProps)
                     <p className="font-mono text-sm text-cream/60">No line items recorded.</p>
                   ) : (
                     <div className="overflow-x-auto border border-cream/20">
-                      <table className="w-full min-w-[32rem] border-collapse">
+                      <table className="w-full min-w-[36rem] border-collapse">
                         <thead>
                           <tr className="border-b border-cream/20 bg-charcoal">
+                            <th className="px-4 py-3 text-left font-mono text-nav uppercase tracking-widest text-cream/60">
+                              ID
+                            </th>
                             <th className="px-4 py-3 text-left font-mono text-nav uppercase tracking-widest text-cream/60">
                               Product
                             </th>
@@ -171,6 +178,9 @@ export function AdminOrderRow({ order, expanded, onToggle }: AdminOrderRowProps)
                                 key={`${order.id}-${item.product_id}-${index}`}
                                 className="border-b border-cream/10 last:border-b-0"
                               >
+                                <td className="px-4 py-3 font-mono text-sm text-cream/80">
+                                  {formatProductId(item.product_id)}
+                                </td>
                                 <td className="px-4 py-3 font-mono text-sm text-cream">
                                   {item.name || `Product #${item.product_id}`}
                                 </td>
@@ -196,7 +206,7 @@ export function AdminOrderRow({ order, expanded, onToggle }: AdminOrderRowProps)
                         <tfoot>
                           <tr className="border-t border-cream/20 bg-charcoal/50">
                             <td
-                              colSpan={5}
+                              colSpan={6}
                               className="px-4 py-3 text-right font-mono text-nav uppercase tracking-widest text-gold"
                             >
                               Total
