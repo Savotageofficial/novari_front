@@ -96,7 +96,7 @@ export async function updateAdminOrderStatus(
   orderId: number,
   status: AdminOrderStatus
 ): Promise<ApiOrder> {
-  return apiFormDataRequest<ApiOrder>(`/api/admin/order/${orderId}/`, { status }, {
+  return apiFormDataRequest<ApiOrder>(`/api/admin/orders/${orderId}/`, { status }, {
     method: 'PATCH',
     token,
   })
