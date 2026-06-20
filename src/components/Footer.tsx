@@ -60,7 +60,7 @@ const linkClass =
 export function Footer() {
   return (
     <footer id="about" className="bg-obsidian px-6 py-section md:px-10 lg:py-section-lg">
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 md:grid-cols-2 md:gap-12">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-12">
         <div className="flex flex-col items-start gap-4">
           <LogoLockup className="items-start" starClassName="h-7" wordmarkClassName="text-wordmark" />
           <p className="max-w-xs text-start font-mono text-sm leading-relaxed text-pretty text-cream md:text-base">
