@@ -76,10 +76,16 @@ export async function apiRequest<T>(
 export async function apiUploadFile<T>(
   path: string,
   file: File,
-  token: string
+  token: string,
+  fields?: Record<string, string | number>
 ): Promise<T> {
   const formData = new FormData()
   formData.append('image', file)
+  if (fields) {
+    for (const [key, value] of Object.entries(fields)) {
+      formData.append(key, String(value))
+    }
+  }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: 'POST',

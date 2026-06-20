@@ -2,17 +2,11 @@ import { useState, type FormEvent } from 'react'
 import { SideDrawer } from '../SideDrawer'
 import { Button } from '../primitives'
 import { TextField } from '../TextField'
-import { AdminColorPicker } from './AdminColorPicker'
-import { AdminImageUpload } from './AdminImageUpload'
-import { PRODUCT_PLACEHOLDER_IMAGE } from '../../data/products'
-import type { ColorOption } from '../../data/colors'
 import type { NewAdminProduct } from '../../hooks/useAdminProducts'
 
 interface AdminAddProductDrawerProps {
   open: boolean
   onClose: () => void
-  colorOptions: ColorOption[]
-  onAddColor: (name: string, hex: string) => ColorOption | null
   onAddProduct: (product: NewAdminProduct) => Promise<string>
   onCreated: (id: string) => void
 }
@@ -26,8 +20,6 @@ const textareaClassName =
 export function AdminAddProductDrawer({
   open,
   onClose,
-  colorOptions,
-  onAddColor,
   onAddProduct,
   onCreated,
 }: AdminAddProductDrawerProps) {
@@ -56,23 +48,6 @@ export function AdminAddProductDrawer({
   function handleClose() {
     resetForm()
     onClose()
-  }
-
-  function handleToggleColor(color: ColorOption) {
-    setSelectedColors((prev) =>
-      prev.includes(color.name)
-        ? prev.filter((entry) => entry !== color.name)
-        : [...prev, color.name]
-    )
-  }
-
-  function handleAddColor(colorName: string, hex: string): boolean {
-    const color = onAddColor(colorName, hex)
-    if (!color) return false
-    setSelectedColors((prev) =>
-      prev.includes(color.name) ? prev : [...prev, color.name]
-    )
-    return true
   }
 
   function handleSubmit(event: FormEvent) {
@@ -125,7 +100,7 @@ export function AdminAddProductDrawer({
             Add Product
           </h2>
           <p className="mt-2 font-mono text-sm text-cream/60">
-            Create a new catalog entry and assign colors.
+            Create a new catalog entry. Add images and colors after saving.
           </p>
         </div>
 

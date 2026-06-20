@@ -9,6 +9,7 @@ interface AdminExpandedPanelProps {
   product: AdminProduct
   onUpdate: (updates: Partial<AdminProduct>) => void
   onToggleColor: (color: ColorOption) => void
+  onImageUploaded: () => void
   colorOptions: ColorOption[]
   onAddColor: (name: string, hex: string) => ColorOption | null
 }
@@ -17,6 +18,7 @@ export function AdminExpandedPanel({
   product,
   onUpdate,
   onToggleColor,
+  onImageUploaded,
   colorOptions,
   onAddColor,
 }: AdminExpandedPanelProps) {
@@ -58,6 +60,7 @@ export function AdminExpandedPanel({
         images={product.images}
         description={product.description}
         onUpdate={onUpdate}
+        onImageUploaded={onImageUploaded}
       />
     </div>
   )

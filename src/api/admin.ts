@@ -70,9 +70,16 @@ export async function deleteAdminProduct(
 
 export async function uploadProductImage(
   token: string,
+  productId: string,
   file: File
-): Promise<{ url: string }> {
-  return apiUploadFile<{ url: string }>('/api/admin/upload/', file, token)
+): Promise<{ url: string; id: number }> {
+  const numericId = parseInt(productId, 10)
+  return apiUploadFile<{ url: string; id: number }>(
+    '/api/admin/upload/',
+    file,
+    token,
+    { product_id: numericId }
+  )
 }
 
 export async function fetchAdminOrders(token: string): Promise<ApiOrder[]> {
