@@ -36,6 +36,7 @@ export default function Admin() {
     error: productsError,
     reload: reloadProducts,
     updateProduct,
+    refreshProduct,
     toggleColor,
     addColor,
     addProduct,
@@ -191,6 +192,7 @@ export default function Admin() {
                   onToggleRow={handleToggleRow}
                   onUpdateProduct={updateProduct}
                   onToggleColor={toggleColor}
+                  onRefreshProduct={(id) => void refreshProduct(id)}
                   onDeleteProduct={handleDeleteProduct}
                   onClearFilters={handleClearFilters}
                   colorOptions={colorOptions}
@@ -226,8 +228,6 @@ export default function Admin() {
       <AdminAddProductDrawer
         open={addProductOpen}
         onClose={() => setAddProductOpen(false)}
-        colorOptions={colorOptions}
-        onAddColor={addColor}
         onAddProduct={addProduct}
         onCreated={handleProductCreated}
       />

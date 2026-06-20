@@ -235,6 +235,26 @@ export function useAdminProducts(options: UseAdminProductsOptions = {}) {
     [token, onCatalogChange]
   )
 
+  const refreshProduct = useCallback(
+    async (id: string) => {
+      if (!token) return
+
+      try {
+        const data = await fetchAdminProducts(token)
+        const updated = data.find((product) => product.id === id)
+        if (updated) {
+          setAdminProducts((prev) =>
+            prev.map((product) => (product.id === id ? updated : product))
+          )
+          onCatalogChange?.()
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to refresh product')
+      }
+    },
+    [token, onCatalogChange]
+  )
+
   return {
     adminProducts,
     colorOptions,
@@ -243,6 +263,7 @@ export function useAdminProducts(options: UseAdminProductsOptions = {}) {
     savingIds,
     reload: loadProducts,
     updateProduct,
+    refreshProduct,
     toggleColor,
     addColor,
     addProduct,

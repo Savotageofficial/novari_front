@@ -6,11 +6,13 @@ import { Button } from '../primitives'
 const ACCEPT = 'image/jpeg,image/png,image/webp'
 
 interface AdminImageUploadProps {
-  onUploaded: (url: string) => void
+  productId: string
+  onUploaded: (result: { url: string; id: number }) => void
   label?: string
 }
 
 export function AdminImageUpload({
+  productId,
   onUploaded,
   label = 'Upload photo',
 }: AdminImageUploadProps) {
@@ -41,8 +43,8 @@ export function AdminImageUpload({
     setError(null)
 
     try {
-      const { url } = await uploadProductImage(token, file)
-      onUploaded(url)
+      const result = await uploadProductImage(token, productId, file)
+      onUploaded(result)
       setFile(null)
       setPreview((previous) => {
         if (previous) URL.revokeObjectURL(previous)

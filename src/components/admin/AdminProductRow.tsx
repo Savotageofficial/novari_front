@@ -10,6 +10,7 @@ interface AdminProductRowProps {
   onToggle: () => void
   onUpdate: (updates: Partial<AdminProduct>) => void
   onToggleColor: (color: ColorOption) => void
+  onImageUploaded: () => void
   onDelete: () => void
   colorOptions: ColorOption[]
   onAddColor: (name: string, hex: string) => ColorOption | null
@@ -35,6 +36,7 @@ export function AdminProductRow({
   onToggle,
   onUpdate,
   onToggleColor,
+  onImageUploaded,
   onDelete,
   colorOptions,
   onAddColor,
@@ -141,6 +143,7 @@ export function AdminProductRow({
                   product={product}
                   onUpdate={onUpdate}
                   onToggleColor={onToggleColor}
+                  onImageUploaded={onImageUploaded}
                   colorOptions={colorOptions}
                   onAddColor={onAddColor}
                 />

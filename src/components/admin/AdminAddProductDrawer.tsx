@@ -2,17 +2,11 @@ import { useState, type FormEvent } from 'react'
 import { SideDrawer } from '../SideDrawer'
 import { Button } from '../primitives'
 import { TextField } from '../TextField'
-import { AdminColorPicker } from './AdminColorPicker'
-import { AdminImageUpload } from './AdminImageUpload'
-import { PRODUCT_PLACEHOLDER_IMAGE } from '../../data/products'
-import type { ColorOption } from '../../data/colors'
 import type { NewAdminProduct } from '../../hooks/useAdminProducts'
 
 interface AdminAddProductDrawerProps {
   open: boolean
   onClose: () => void
-  colorOptions: ColorOption[]
-  onAddColor: (name: string, hex: string) => ColorOption | null
   onAddProduct: (product: NewAdminProduct) => Promise<string>
   onCreated: (id: string) => void
 }
@@ -26,8 +20,6 @@ const textareaClassName =
 export function AdminAddProductDrawer({
   open,
   onClose,
-  colorOptions,
-  onAddColor,
   onAddProduct,
   onCreated,
 }: AdminAddProductDrawerProps) {
@@ -36,8 +28,6 @@ export function AdminAddProductDrawer({
   const [numericPrice, setNumericPrice] = useState(450)
   const [discount, setDiscount] = useState(0)
   const [description, setDescription] = useState('')
-  const [selectedColors, setSelectedColors] = useState<string[]>([])
-  const [images, setImages] = useState<string[]>([])
   const [inStock, setInStock] = useState(true)
   const [stockCount, setStockCount] = useState(10)
   const [error, setError] = useState<string | null>(null)
@@ -48,8 +38,6 @@ export function AdminAddProductDrawer({
     setNumericPrice(450)
     setDiscount(0)
     setDescription('')
-    setSelectedColors([])
-    setImages([])
     setInStock(true)
     setStockCount(10)
     setError(null)
@@ -58,23 +46,6 @@ export function AdminAddProductDrawer({
   function handleClose() {
     resetForm()
     onClose()
-  }
-
-  function handleToggleColor(color: ColorOption) {
-    setSelectedColors((prev) =>
-      prev.includes(color.name)
-        ? prev.filter((entry) => entry !== color.name)
-        : [...prev, color.name]
-    )
-  }
-
-  function handleAddColor(colorName: string, hex: string): boolean {
-    const color = onAddColor(colorName, hex)
-    if (!color) return false
-    setSelectedColors((prev) =>
-      prev.includes(color.name) ? prev : [...prev, color.name]
-    )
-    return true
   }
 
   function handleSubmit(event: FormEvent) {
@@ -93,8 +64,8 @@ export function AdminAddProductDrawer({
           numericPrice: Math.max(0, numericPrice),
           discount: Math.min(100, Math.max(0, discount)),
           description: description.trim(),
-          images: images.length > 0 ? images : [PRODUCT_PLACEHOLDER_IMAGE],
-          colors: selectedColors,
+          images: [],
+          colors: [],
           inStock,
           stockCount: Math.max(0, stockCount),
         })
@@ -128,7 +99,7 @@ export function AdminAddProductDrawer({
             Add Product
           </h2>
           <p className="mt-2 font-mono text-sm text-cream/60">
-            Create a new catalog entry and assign colors.
+            Create a new catalog entry. Add images and colors after saving.
           </p>
         </div>
 
@@ -270,52 +241,6 @@ export function AdminAddProductDrawer({
               className={textareaClassName}
             />
           </div>
-
-          <div className="space-y-4">
-            <p className="font-mono text-sm uppercase tracking-widest text-cream/80">
-              Product images
-            </p>
-            {images.length > 0 && (
-              <ul className="space-y-2">
-                {images.map((image, index) => (
-                  <li
-                    key={`new-product-image-${index}`}
-                    className="flex items-center gap-3 border border-cream/20 bg-obsidian p-3"
-                  >
-                    <img
-                      src={image}
-                      alt=""
-                      className="h-12 w-12 border border-cream/30 object-cover"
-                    />
-                    <span className="flex-1 truncate font-mono text-xs text-cream/60">
-                      {image}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setImages((prev) => prev.filter((_, i) => i !== index))
-                      }
-                      aria-label={`Remove image ${index + 1}`}
-                      className="flex h-10 w-10 shrink-0 items-center justify-center border border-cream/30 bg-obsidian font-mono text-sm text-cream transition-colors duration-300 hover:border-gold hover:text-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
-                    >
-                      -
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <AdminImageUpload
-              label="Upload photo"
-              onUploaded={(url) => setImages((prev) => [...prev, url])}
-            />
-          </div>
-
-          <AdminColorPicker
-            availableColors={colorOptions}
-            selectedColors={selectedColors}
-            onToggleColor={handleToggleColor}
-            onAddColor={handleAddColor}
-          />
 
           {error && (
             <p className="font-mono text-sm text-gold" role="alert">
