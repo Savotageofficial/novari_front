@@ -6,6 +6,66 @@ import { useAdminAuth } from './useAdminAuth'
 export type OrderSortKey = 'id' | 'date' | 'customer' | 'total'
 export type OrderSortDir = 'asc' | 'desc'
 
+export const ORDER_SEARCH_HINTS = [
+  { prefix: '#', label: 'order ID' },
+  { prefix: '$', label: 'product ID' },
+  { prefix: '@', label: 'email' },
+  { prefix: '!', label: 'phone' },
+  { prefix: '~', label: 'customer name' },
+] as const
+
+type OrderSearchField = 'all' | 'orderId' | 'productId' | 'email' | 'phone' | 'customer'
+
+function parseOrderSearchQuery(raw: string): { field: OrderSearchField; value: string } {
+  const trimmed = raw.trim()
+  if (!trimmed) return { field: 'all', value: '' }
+
+  const prefixToField: Record<string, OrderSearchField> = {
+    '#': 'orderId',
+    '$': 'productId',
+    '@': 'email',
+    '!': 'phone',
+    '~': 'customer',
+  }
+
+  const prefix = trimmed[0]
+  if (prefix && prefixToField[prefix] && trimmed.length > 1) {
+    return { field: prefixToField[prefix], value: trimmed.slice(1).trim() }
+  }
+
+  return { field: 'all', value: trimmed }
+}
+
+function orderMatchesSearch(order: ApiOrder, field: OrderSearchField, value: string): boolean {
+  if (!value) return true
+
+  const query = value.toLowerCase()
+  const customer = `${order.firstname} ${order.lastname}`.toLowerCase()
+
+  switch (field) {
+    case 'orderId':
+      return String(order.id).includes(value)
+    case 'productId':
+      return order.items.some((item) => {
+        const id = String(item.product_id)
+        return id.includes(value) || id.padStart(2, '0').includes(value)
+      })
+    case 'email':
+      return order.email.toLowerCase().includes(query)
+    case 'phone':
+      return order.phone.includes(value)
+    case 'customer':
+      return customer.includes(query)
+    case 'all':
+      return (
+        String(order.id).includes(query) ||
+        order.email.toLowerCase().includes(query) ||
+        order.phone.includes(query) ||
+        customer.includes(query)
+      )
+  }
+}
+
 function compareOrders(a: ApiOrder, b: ApiOrder, sortKey: OrderSortKey): number {
   switch (sortKey) {
     case 'id':
@@ -32,17 +92,9 @@ export function filterAdminOrders(
 ): ApiOrder[] {
   let result = [...orders]
 
-  if (searchQuery.trim()) {
-    const query = searchQuery.toLowerCase()
-    result = result.filter((order) => {
-      const customer = `${order.firstname} ${order.lastname}`.toLowerCase()
-      return (
-        String(order.id).includes(query) ||
-        order.email.toLowerCase().includes(query) ||
-        order.phone.includes(query) ||
-        customer.includes(query)
-      )
-    })
+  const { field, value } = parseOrderSearchQuery(searchQuery)
+  if (value) {
+    result = result.filter((order) => orderMatchesSearch(order, field, value))
   }
 
   result.sort((a, b) => {
